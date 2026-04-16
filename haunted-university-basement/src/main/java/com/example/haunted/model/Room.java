@@ -19,7 +19,7 @@ public class Room {
     private String requiredKeyName;
     private Trap trap;
 
-    public Room(String id, String name, String description) {
+    public Room(String id, String name) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.description = Objects.requireNonNull(description);

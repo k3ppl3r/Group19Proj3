@@ -1,5 +1,7 @@
 package com.example.haunted.config;
 
+import java.util.List;
+
 import com.example.haunted.engine.CombatEngine;
 import com.example.haunted.engine.GameEngine;
 import com.example.haunted.engine.InteractionEngine;
@@ -18,25 +20,21 @@ import com.example.haunted.model.Room;
 import com.example.haunted.model.Trap;
 import com.example.haunted.model.TrapType;
 import com.example.haunted.model.Weapon;
-import com.example.haunted.rules.DamageCalculator;
 import com.example.haunted.rules.QuestTracker;
-import com.example.haunted.rules.TrapResolver;
-
-import java.util.List;
 
 public final class DungeonFactory {
     private DungeonFactory() {
     }
 
     public static GameEngine createGame() {
-        Room stairwell = new Room("stairwell", "Maintenance Stairwell", "The flickering stairwell leading into the basement.");
-        Room lectureHall = new Room("lectureHall", "Abandoned Lecture Hall", "Dusty desks and a broken projector.");
-        Room labStorage = new Room("labStorage", "Lab Storage", "Shelves of outdated hardware and chemicals.");
-        Room brokenElevator = new Room("brokenElevator", "Broken Elevator", "The elevator doors hang over a dark shaft.");
-        Room serverCloset = new Room("serverCloset", "Server Closet", "A warm humming room full of blinking servers.");
-        Room examArchive = new Room("examArchive", "Exam Archive", "Cabinets of old exams and paperwork.");
-        Room deanVault = new Room("deanVault", "Dean Vault", "A hidden chamber guarded by university secrets.");
-        Room finalChamber = new Room("finalChamber", "Final Chamber", "A spectral exam hall where the boss waits.");
+        Room stairwell = new Room("stairwell", "Maintenance Stairwell");
+        Room lectureHall = new Room("lectureHall", "Abandoned Lecture Hall");
+        Room labStorage = new Room("labStorage", "Lab Storage");
+        Room brokenElevator = new Room("brokenElevator", "Broken Elevator");
+        Room serverCloset = new Room("serverCloset", "Server Closet");
+        Room examArchive = new Room("examArchive", "Exam Archive");
+        Room deanVault = new Room("deanVault", "Dean Vault");
+        Room finalChamber = new Room("finalChamber", "Final Chamber");
 
         stairwell.connect(Direction.EAST, lectureHall);
 
@@ -92,9 +90,9 @@ public final class DungeonFactory {
         );
 
         QuestTracker questTracker = new QuestTracker();
-        MovementEngine movementEngine = new MovementEngine(new TrapResolver());
-        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), questTracker);
-        InteractionEngine interactionEngine = new InteractionEngine(questTracker);
+        MovementEngine movementEngine = new MovementEngine();
+        CombatEngine combatEngine = new CombatEngine();
+        InteractionEngine interactionEngine = new InteractionEngine();
 
         return new GameEngine(player, quest, movementEngine, combatEngine, interactionEngine);
     }

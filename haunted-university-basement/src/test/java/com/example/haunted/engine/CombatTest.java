@@ -32,7 +32,6 @@ import com.example.haunted.model.QuestItem;
 import com.example.haunted.model.Room;
 import com.example.haunted.rules.DamageCalculator;
 import com.example.haunted.rules.QuestTracker;
-import com.example.haunted.rules.TrapResolver;
 
 public class CombatTest {
 
@@ -116,13 +115,13 @@ public class CombatTest {
     void anUnderpoweredStudentGetsCounterattackedByTheBoss() {
         //using Chad so the boss survives long enough to hit back
         Player underpoweredStudent = new Player("Chad", 100, 5, 0, new Inventory(10));
-        Room finalRoom = new Room("final", "Final Chamber", "You probably should have studied.");
+        Room finalRoom = new Room("final", "Final Chamber");
         BossMonster phantom = new BossMonster("Final Exam Phantom", 40, 10, 4, List.of(), 3);
         finalRoom.addMonster(phantom);
         underpoweredStudent.setCurrentRoom(finalRoom);
 
         Quest quest = new Quest("Escape the Basement", "Good luck.");
-        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), new QuestTracker());
+        CombatEngine combatEngine = new CombatEngine();
 
         int hp = underpoweredStudent.getHealth();
         CombatResult res = combatEngine.attack(underpoweredStudent, quest, phantom);
@@ -136,7 +135,7 @@ public class CombatTest {
     void retrievingTheGradebookAndSlayingThePhantomActuallyWinsTheGame() {
         //skip the dungeon crawl, build a direct boss arena for this test
         Player hero = new Player("Hero", 999, 999, 10, new Inventory(10));
-        Room finalRoom = new Room("final", "Final Chamber", "The last stand.");
+        Room finalRoom = new Room("final", "Final Chamber");
         BossMonster phantom = new BossMonster("Final Exam Phantom", 40, 10, 4, List.of(), 3);
         finalRoom.addMonster(phantom);
         finalRoom.addItem(new QuestItem("Lost Gradebook", "The legendary missing grade book."));
@@ -144,11 +143,11 @@ public class CombatTest {
 
         Quest quest = new Quest("Escape the Basement", "Recover the grade book and defeat the Phantom.");
         QuestTracker tracker = new QuestTracker();
-        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), tracker);
-        InteractionEngine interactionEngine = new InteractionEngine(tracker);
+        CombatEngine combatEngine = new CombatEngine();
+        InteractionEngine interactionEngine = new InteractionEngine();
         GameEngine bossArena = new GameEngine(
                 hero, quest,
-                new MovementEngine(new TrapResolver()),
+                new MovementEngine(),
                 combatEngine, interactionEngine);
 
         bossArena.pickUpItem("Lost Gradebook");

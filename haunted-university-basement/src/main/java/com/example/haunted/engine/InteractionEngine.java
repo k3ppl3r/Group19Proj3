@@ -16,7 +16,7 @@ import java.util.Optional;
 public class InteractionEngine {
     private final QuestTracker questTracker;
 
-    public InteractionEngine(QuestTracker questTracker) {
+    public InteractionEngine() {
         this.questTracker = questTracker;
     }
 

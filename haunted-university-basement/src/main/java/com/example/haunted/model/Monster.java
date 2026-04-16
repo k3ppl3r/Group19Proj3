@@ -53,4 +53,12 @@ public class Monster {
     public List<Item> getLoot() {
         return Collections.unmodifiableList(loot);
     }
+
+    Object isDefeated() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    void heal(int healAmount) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

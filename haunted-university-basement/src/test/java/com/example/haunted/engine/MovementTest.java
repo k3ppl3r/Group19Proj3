@@ -100,7 +100,7 @@ public class MovementTest {
     void nullTrapDoesNothing() {
         TrapResolver resolver = new TrapResolver();
         Player student = new Player("Alex", 100, 10, 5, new Inventory(10));
-        Room safeRoom = new Room("safe", "Safe Room", "Nothing here.");
+        Room safeRoom = new Room("safe", "Safe Room");
         student.setCurrentRoom(safeRoom);
 
         InteractionResult res = resolver.resolveTrap(student, null);
@@ -112,7 +112,7 @@ public class MovementTest {
     void disarmedTrapDoesNothing() {
         TrapResolver resolver = new TrapResolver();
         Player student = new Player("Alex", 100, 10, 5, new Inventory(10));
-        Room room = new Room("r", "Room", "Desc.");
+        Room room = new Room("r", "Room");
         student.setCurrentRoom(room);
 
         Trap dud = new Trap("Dud Trap", TrapType.STEAM, 10, false, true);
@@ -124,7 +124,7 @@ public class MovementTest {
     void aSteamVentKeepsGoingOffEveryTimeYouWalkThrough() {
         TrapResolver resolver = new TrapResolver();
         Player student = new Player("Alex", 100, 10, 5, new Inventory(10));
-        Room room = new Room("r", "Room", "Desc.");
+        Room room = new Room("r", "Room");
         student.setCurrentRoom(room);
 
         //oneTimeTrigger = false means it never disarms

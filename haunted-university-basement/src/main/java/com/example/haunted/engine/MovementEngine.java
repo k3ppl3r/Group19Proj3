@@ -11,7 +11,7 @@ import com.example.haunted.rules.TrapResolver;
 public class MovementEngine {
     private final TrapResolver trapResolver;
 
-    public MovementEngine(TrapResolver trapResolver) {
+    public MovementEngine() {
         this.trapResolver = trapResolver;
     }
 
