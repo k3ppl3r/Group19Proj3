@@ -14,16 +14,12 @@
 
 package com.example.haunted.engine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +31,6 @@ import com.example.haunted.events.InteractionResult;
 import com.example.haunted.events.MoveResult;
 import com.example.haunted.model.Armor;
 import com.example.haunted.model.Direction;
-import com.example.haunted.model.Inventory;
 import com.example.haunted.model.Item;
 import com.example.haunted.model.Key;
 import com.example.haunted.model.Monster;
@@ -50,36 +45,6 @@ class GameEngineTest {
     private Room northRoom;
     private Quest quest;
     private Monster ghost;
-
-    @BeforeEach
-    void setUp() {
-        // 1. Initialize Rooms
-        startRoom = new Room("Basement Entrance", "A dark, damp entry.");
-        northRoom = new Room("Study Hall", "Filled with old textbooks.");
-        startRoom.setExit(Direction.NORTH, northRoom);
-        northRoom.setExit(Direction.SOUTH, startRoom);
-
-        // 2. Initialize Engines (using real implementations as mocking is prohibited)
-        MovementEngine moveEngine = new MovementEngine();
-        CombatEngine combatEngine = new CombatEngine();
-        InteractionEngine interactionEngine = new InteractionEngine();
-
-        // 3. Initialize Quest and Monster
-        List<Item> loot = new ArrayList<>();
-        loot.add(new Key("Library Key", "Opens the archives."));
-        ghost = new Monster("Plagiarism Ghost", 20, 5, 2, loot);
-        startRoom.addMonster(ghost);
-        
-        // Assuming a standard Quest implementation that tracks this monster
-        quest = new Quest("Defeat the Ghost", "Recover the gradebook.");
-
-        // 4. Initialize Player and GameEngine
-        Inventory inventory = new Inventory(5);
-        player = new Player("Hero", 100, 10, 5, inventory);
-        player.setCurrentRoom(startRoom);
-
-        gameEngine = new GameEngine(player, quest, moveEngine, combatEngine, interactionEngine);
-    }
 
     // --- MOVEMENT & NAVIGATION ---
 

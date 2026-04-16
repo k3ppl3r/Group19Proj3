@@ -11,6 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,12 @@ class MonsterTest {
     private List<Item> testLoot;
     private Monster monster;
     private final int MAX_HP = 100;
+
+    @BeforeEach
+    void setup() {
+        testLoot = new java.util.ArrayList<>(List.of(new Key("Old Key", "A rusty key.")));
+        monster = new Monster("Test Ghost", MAX_HP, 10, 5, testLoot);
+    }
 
     @Test
     @DisplayName("Mutation Killing: Verify defensive copy of loot in constructor")

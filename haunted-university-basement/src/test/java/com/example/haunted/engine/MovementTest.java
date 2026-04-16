@@ -11,10 +11,12 @@ package com.example.haunted.engine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import com.example.haunted.config.DungeonFactory;
 import com.example.haunted.events.InteractionResult;
 import com.example.haunted.events.MoveResult;
 import com.example.haunted.model.Direction;
@@ -28,6 +30,11 @@ import com.example.haunted.rules.TrapResolver;
 public class MovementTest {
 
     private GameEngine game;
+
+    @BeforeEach
+    void newGame() {
+        game = DungeonFactory.createGame();
+    }
 
     @Test
     void moveEastFromStairwell() {

@@ -54,11 +54,11 @@ public class Monster {
         return Collections.unmodifiableList(loot);
     }
 
-    Object isDefeated() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean isDefeated() {
+        return health <= 0;
     }
 
-    void heal(int healAmount) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void heal(int healAmount) {
+        health = Math.min(maxHealth, health + Math.max(0, healAmount));
     }
 }

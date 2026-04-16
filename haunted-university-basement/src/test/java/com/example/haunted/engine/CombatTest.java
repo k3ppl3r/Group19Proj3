@@ -15,12 +15,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import com.example.haunted.config.DungeonFactory;
 import com.example.haunted.events.CombatResult;
 import com.example.haunted.model.BossMonster;
+import com.example.haunted.model.Direction;
 import com.example.haunted.model.Inventory;
 import com.example.haunted.model.Monster;
 import com.example.haunted.model.Player;
@@ -28,10 +31,18 @@ import com.example.haunted.model.Quest;
 import com.example.haunted.model.QuestItem;
 import com.example.haunted.model.Room;
 import com.example.haunted.rules.DamageCalculator;
+import com.example.haunted.rules.QuestTracker;
+import com.example.haunted.rules.TrapResolver;
 
 public class CombatTest {
 
     private GameEngine game;
+
+    @BeforeEach
+    void walkIntoTheLectureHallAndFaceTheTA() {
+        game = DungeonFactory.createGame();
+        game.move(Direction.EAST); //stairwell -> lectureHall, where the TA is waiting
+    }
 
     @Test
     void attackDamagesMonster() {
