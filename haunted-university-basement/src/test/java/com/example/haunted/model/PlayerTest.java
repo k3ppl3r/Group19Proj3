@@ -1,10 +1,9 @@
 //Brady
 //Prompt:
-//Write humanized JUnit 5 tests for the Player model class covering: takeDamage reduces health correctly,
-//health never drops below zero (parameterized with boundary values including overkill), heal restores health
-//but cannot exceed max, player dies at zero HP, isAlive returns correct state, equipWeapon increases
-//getAttackPower, equipArmor increases getDefensePower, and base attack/defense are used when nothing is equipped.
-//Use "Alex" as the player name and keep test names conversational.
+//i need tests for the Player class. check that takeDamage lowers health, that health
+//cant go below 0 even with huge damage (use parameterized tests), that heal works but
+//doesn't overshoot the max hp, player is dead when hp hits 0, and that weapons and armor
+//actually update the attack and defense numbers. call the player Alex
 
 package com.example.haunted.model;
 
@@ -19,46 +18,46 @@ import org.junit.jupiter.params.provider.CsvSource;
 public class PlayerTest {
 
     @Test
-    void playerShouldLoseHealthWhenHitByAMonster() {
+    void testTakeDamage() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
-        //Alex walks into a room and gets smacked for 30 damage
         alex.takeDamage(30);
-        assertEquals(70, alex.getHealth(), "Alex should have 70 HP left after taking 30 damage");
+        assertEquals(70, alex.getHealth()); // 100 - 30 = 70
     }
 
+    //prof wants us to use parameterized tests so here we go
     @ParameterizedTest(name = "taking {0} damage from {1} HP leaves {2} HP")
     @CsvSource({
         "10, 100, 90",
         "50, 100, 50",
         "100, 100, 0",
-        "999, 100, 0"   //overkill should still floor at zero, not go negative
+        "999, 100, 0"   //overkill should floor at zero not go negative
     })
-    void playerHealthNeverDropsBelowZero(int damage, int maxHp, int expectedHealth) {
+    void healthCantGoNegative(int damage, int maxHp, int expectedHealth) {
         Player alex = new Player("Alex", maxHp, 10, 5, new Inventory(10));
         alex.takeDamage(damage);
         assertEquals(expectedHealth, alex.getHealth());
     }
 
     @Test
-    void drinkingAPotionRestoresSomeHealth() {
+    void healingRestoresHP() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
-        alex.takeDamage(40);   //hurt first
+        alex.takeDamage(40);
         alex.heal(20);
         assertEquals(80, alex.getHealth());
     }
 
     @Test
-    void healingCantPushHealthAboveMaximum() {
+    void cantHealPastMax() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
-        alex.heal(999);  //chug every potion in the known universe
-        assertEquals(100, alex.getHealth(), "Cannot heal above max HP");
+        alex.heal(999); //should still cap at 100
+        assertEquals(100, alex.getHealth());
     }
 
     @Test
-    void alexDiesAfterTakingFatalDamage() {
+    void playerDiesAt0HP() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
         alex.takeDamage(100);
-        assertFalse(alex.isAlive(), "Alex should be dead after taking 100 damage");
+        assertFalse(alex.isAlive());
     }
 
     @Test
@@ -68,32 +67,30 @@ public class PlayerTest {
     }
 
     @Test
-    void pickingUpAWeaponIncreasesHowHardAlexHits() {
+    void weaponBoostsAttack() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
-        int unarmedAttack = alex.getAttackPower();
+        int baseAtk = alex.getAttackPower();
         alex.equipWeapon(new Weapon("Rusty Stapler", "Better than nothing.", 5));
-        assertEquals(unarmedAttack + 5, alex.getAttackPower(),
-                "Weapon bonus should stack on top of base attack");
+        assertEquals(baseAtk + 5, alex.getAttackPower()); // +5 bonus stacks on top of base
     }
 
     @Test
-    void wearingArmorMakesAlexHarderToHurt() {
+    void armorBoostsDefense() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
-        int unarmored = alex.getDefensePower();
+        int baseDef = alex.getDefensePower();
         alex.equipArmor(new Armor("Trash Lid Shield", "A bin lid repurposed for war.", 4));
-        assertEquals(unarmored + 4, alex.getDefensePower(),
-                "Armor bonus should stack on top of base defense");
+        assertEquals(baseDef + 4, alex.getDefensePower());
     }
 
     @Test
-    void alexWithNoWeaponStillUsesBaseAttack() {
+    void noWeaponMeansJustBaseAttack() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
         assertNull(alex.getEquippedWeapon());
         assertEquals(10, alex.getAttackPower());
     }
 
     @Test
-    void alexWithNoArmorStillUsesBaseDefense() {
+    void noArmorMeansJustBaseDefense() {
         Player alex = new Player("Alex", 100, 10, 5, new Inventory(10));
         assertNull(alex.getEquippedArmor());
         assertEquals(5, alex.getDefensePower());

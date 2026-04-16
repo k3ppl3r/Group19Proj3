@@ -1,10 +1,10 @@
 //Brady
 //Prompt:
-//Write humanized JUnit 5 tests that call DungeonFactory.createGame() and verify the entire game world is
-//wired up correctly: player starts in stairwell, stairwell has only one exit going east, lecture hall has
-//a Coffee Potion and the Sleep-Deprived TA, exam archive and final chamber are locked, broken elevator has
-//an armed trap, lab storage has the Archive Key, dean vault has the Vault Key, quest starts as NOT_STARTED,
-//player is alive, game is not over, game is not won. Use a @BeforeEach to build the dungeon fresh each test.
+//need tests that call DungeonFactory.createGame() to make sure the world gets built right.
+//check the player starts in stairwell, stairwell only has east exit, lecture hall has coffee
+//potion and the TA, exam archive and final chamber are locked, broken elevator has a trap,
+//archive key is in lab storage, vault key in dean vault, quest is NOT_STARTED, player alive.
+//use @BeforeEach
 
 package com.example.haunted.config;
 
@@ -20,8 +20,6 @@ import com.example.haunted.engine.GameEngine;
 import com.example.haunted.model.Direction;
 import com.example.haunted.model.QuestStatus;
 
-//makes sure the dungeon is actually built right before we even start playing.
-//if any of these fail, nothing else matters.
 public class GameSetupTest {
 
     private GameEngine game;
@@ -32,8 +30,8 @@ public class GameSetupTest {
     }
 
     @Test
-    void theDungeonActuallyBuildsWithoutCrashing() {
-        assertNotNull(game, "DungeonFactory should give us something to work with");
+    void dungeonLoads() {
+        assertNotNull(game);
     }
 
     @Test
@@ -42,80 +40,74 @@ public class GameSetupTest {
     }
 
     @Test
-    void theStairwellIsEssentiallyADeadEndWithOneExitEast() {
-        assertNotNull(game.getCurrentRoom().getExit(Direction.EAST),   "east exit should exist");
-        assertNull(game.getCurrentRoom().getExit(Direction.WEST),  "no west exit");
-        assertNull(game.getCurrentRoom().getExit(Direction.NORTH), "no north exit");
-        assertNull(game.getCurrentRoom().getExit(Direction.SOUTH), "no south exit");
+    void stairwellOnlyHasEastExit() {
+        assertNotNull(game.getCurrentRoom().getExit(Direction.EAST));
+        assertNull(game.getCurrentRoom().getExit(Direction.WEST));
+        assertNull(game.getCurrentRoom().getExit(Direction.NORTH));
+        assertNull(game.getCurrentRoom().getExit(Direction.SOUTH));
     }
 
     @Test
     void someoneLedACoffeePotionInTheLectureHallForUs() {
         game.move(Direction.EAST);
-        assertTrue(game.getCurrentRoom().findItem("Coffee Potion").isPresent(),
-                "Coffee Potion should be sitting on a desk in the lecture hall");
+        assertTrue(game.getCurrentRoom().findItem("Coffee Potion").isPresent());
     }
 
     @Test
-    void theSleepDeprivedTAIsAlreadyLurkingInTheLectureHall() {
+    void lectureHallHasTA() {
         game.move(Direction.EAST);
-        assertTrue(game.getCurrentRoom().findMonster("Sleep-Deprived TA").isPresent(),
-                "The TA never leaves, apparently");
+        assertTrue(game.getCurrentRoom().findMonster("Sleep-Deprived TA").isPresent());
     }
 
     @Test
-    void theQuestHasNotEvenStartedYet() {
-        assertEquals(QuestStatus.NOT_STARTED, game.getQuest().getStatus(),
-                "Quest should be dormant until we do something worth noting");
+    void questNotStartedAtBeginning() {
+        assertEquals(QuestStatus.NOT_STARTED, game.getQuest().getStatus());
     }
 
     @Test
     void theExamArchiveIsPadlockedAndWeNeedAKey() {
-        game.move(Direction.EAST); // into lectureHall
-        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked(),
-                "Exam Archive door should be locked at game start");
+        game.move(Direction.EAST);
+        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked());
     }
 
     @Test
     void theFinalChamberIsAlsoLockedBecauseOfCourseItIs() {
-        //long walk: stairwell -> lectureHall -> labStorage -> serverCloset -> deanVault
+        //had to look up the path for this one
         game.move(Direction.EAST);
         game.move(Direction.EAST);
         game.move(Direction.NORTH);
         game.move(Direction.EAST);
-        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked(),
-                "Final Chamber should definitely be locked");
+        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked());
     }
 
     @Test
     void theElevatorIsADeathtrapAndWeHaveBeenWarned() {
-        game.move(Direction.EAST); //lectureHall
+        game.move(Direction.EAST);
         var trap = game.getCurrentRoom().getExit(Direction.SOUTH).getTrap();
-        assertNotNull(trap, "Broken elevator should have a nasty trap waiting");
-        assertTrue(trap.isArmed(), "Trap should be live and ready");
+        assertNotNull(trap);
+        assertTrue(trap.isArmed());
     }
 
     @Test
-    void theArchiveKeyIsHiddenInLabStorage() {
-        game.move(Direction.EAST); //lectureHall
-        game.move(Direction.EAST); //labStorage
-        assertTrue(game.getCurrentRoom().findItem("Archive Key").isPresent(),
-                "Archive Key should be collecting dust on a lab shelf");
+    void archiveKeyInLabStorage() {
+        game.move(Direction.EAST);
+        game.move(Direction.EAST);
+        assertTrue(game.getCurrentRoom().findItem("Archive Key").isPresent());
     }
 
     @Test
     void theVaultKeyIsDeepInTheDeanVault() {
-        game.move(Direction.EAST);  //lectureHall
-        game.move(Direction.EAST);  //labStorage
-        game.move(Direction.NORTH); //serverCloset
-        game.move(Direction.EAST);  //deanVault
+        game.move(Direction.EAST);
+        game.move(Direction.EAST);
+        game.move(Direction.NORTH);
+        game.move(Direction.EAST);
         assertTrue(game.getCurrentRoom().findItem("Vault Key").isPresent());
     }
 
     @Test
-    void theStudentIsAliveAndStandingAtGameStart() {
+    void playerAliveAtStart() {
         assertTrue(game.getPlayer().isAlive());
-        assertFalse(game.isGameOver(), "Game should not be over before it even starts");
+        assertFalse(game.isGameOver());
     }
 
     @Test

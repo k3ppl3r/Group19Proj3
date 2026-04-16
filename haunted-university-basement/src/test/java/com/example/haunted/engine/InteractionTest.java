@@ -1,12 +1,12 @@
 //Brady
 //Prompt:
-//Write humanized JUnit 5 tests for InteractionEngine via GameEngine covering: pickup success adds to
-//inventory, pickup nonexistent item fails, full inventory blocks pickup and item stays in room, picking
-//up Lost Gradebook marks quest gradebookRecovered. Equip weapon boosts attack, equip armor boosts defense,
-//equipping a potion fails, equipping something not in inventory fails. Using a potion heals a wounded
-//player, using a key fails, using item not in inventory fails. Unlocking exam archive with correct key
-//succeeds, unlocking without key fails, unlocking a direction with no room fails, unlocking already-open
-//room succeeds quietly. Parameterized inventory boundary test at 0, 1, 7, and 8 items out of 8 capacity.
+//tests for item interaction. picking up an item, picking up something that doesn't exist,
+//and picking up when inventory is full. picking up the lost grade book should update the quest.
+//equipping a weapon and armor and checking that stats change. equipping a potion should fail,
+//equipping something you don't have should fail. using a potion to heal, trying to use a key,
+//using something not in inventory. unlocking with the right key, without a key, toward a
+//direction with no room, and on a room already open. parameterized test for inventory capacity
+//at boundary values 0, 1, 7, and 8
 
 package com.example.haunted.engine;
 
@@ -36,160 +36,140 @@ public class InteractionTest {
         game.move(Direction.EAST); //stairwell -> lectureHall, which has the Coffee Potion
     }
 
-    //picking up items
-
     @Test
-    void grabbingTheCoffeePotionPutsItInYourBackpack() {
-        InteractionResult result = game.pickUpItem("Coffee Potion");
-        assertTrue(result.isSuccess());
-        assertTrue(game.getPlayer().getInventory().contains("Coffee Potion"),
-                "Coffee Potion should now be in inventory");
+    void pickupAddsToInventory() {
+        InteractionResult res = game.pickUpItem("Coffee Potion");
+        assertTrue(res.isSuccess());
+        assertTrue(game.getPlayer().getInventory().contains("Coffee Potion"));
     }
 
     @Test
-    void tryingToPickUpSomethingThatDoesNotExistGoesNowhere() {
-        InteractionResult result = game.pickUpItem("Invisible Homework");
-        assertFalse(result.isSuccess(), "You cannot pick up something that isn't there");
+    void pickupNonexistentItemFails() {
+        InteractionResult res = game.pickUpItem("Invisible Homework");
+        assertFalse(res.isSuccess());
     }
 
     @Test
     void aFullBackpackMeansYouHaveToLeaveThingsOnTheFloor() {
-        //fill up all 8 inventory slots with junk
+        //fill up all 8 slots with junk first
         Player player = game.getPlayer();
         for (int i = 0; i < 8; i++) {
             player.getInventory().addItem(new Potion("Filler Potion " + i, "Taking up space.", 1));
         }
         assertTrue(player.getInventory().isFull());
 
-        InteractionResult result = game.pickUpItem("Coffee Potion");
-        assertFalse(result.isSuccess(), "Full inventory should block pickup");
+        InteractionResult res = game.pickUpItem("Coffee Potion");
+        assertFalse(res.isSuccess(), "Full inventory should block pickup");
         assertTrue(game.getCurrentRoom().findItem("Coffee Potion").isPresent(),
                 "Coffee Potion should still be on the floor since we couldn't grab it");
     }
 
     @Test
     void findingTheLostGradebookUpdatesTheQuest() {
-        //full route: lectureHall -> labStorage (grab key) -> back -> unlock -> examArchive -> grab it
-        game.move(Direction.EAST);        //lectureHall -> labStorage
+        //had to figure out the path for this one: east to lab, grab key, back, unlock, north
+        game.move(Direction.EAST);
         game.pickUpItem("Archive Key");
-        game.move(Direction.WEST);        //back to lectureHall
-        game.unlockRoom(Direction.NORTH); //use the key to open the exam archive
-        game.move(Direction.NORTH);       //lectureHall -> examArchive
+        game.move(Direction.WEST);
+        game.unlockRoom(Direction.NORTH);
+        game.move(Direction.NORTH);
 
-        InteractionResult result = game.pickUpItem("Lost Gradebook");
-        assertTrue(result.isSuccess());
+        InteractionResult res = game.pickUpItem("Lost Gradebook");
+        assertTrue(res.isSuccess());
         assertTrue(game.getQuest().isGradebookRecovered(),
-                "The quest should know we finally found that gradebook");
+                "The quest should know we finally found that grade book");
     }
-
-    //equipping items
 
     @Test
     void equippingAWeaponMakesYouHitHarder() {
         Weapon foamSword = new Weapon("Foam Sword", "Surprisingly threatening.", 7);
         game.getPlayer().getInventory().addItem(foamSword);
-        int attackBefore = game.getPlayer().getAttackPower();
+        int atk = game.getPlayer().getAttackPower();
 
         game.equipItem("Foam Sword");
-        assertEquals(attackBefore + 7, game.getPlayer().getAttackPower(),
-                "Foam sword should add 7 to attack power");
+        assertEquals(atk + 7, game.getPlayer().getAttackPower());
     }
 
     @Test
     void equippingArmorMakesYouHarderToKill() {
-        //calculator shield is in labStorage just east of here
-        game.move(Direction.EAST);        //lectureHall -> labStorage
+        //Calculator Shield is in labStorage just east of here
+        game.move(Direction.EAST);
         game.pickUpItem("Calculator Shield");
-        int defenseBefore = game.getPlayer().getDefensePower();
+        int def = game.getPlayer().getDefensePower();
 
         game.equipItem("Calculator Shield");
-        assertEquals(defenseBefore + 3, game.getPlayer().getDefensePower(),
-                "Calculator Shield should add 3 to defense");
+        assertEquals(def + 3, game.getPlayer().getDefensePower());
     }
 
     @Test
     void youCannotWearACoffeePotion() {
         game.pickUpItem("Coffee Potion");
-        InteractionResult result = game.equipItem("Coffee Potion");
-        assertFalse(result.isSuccess(), "Potions are not gear");
+        InteractionResult res = game.equipItem("Coffee Potion");
+        assertFalse(res.isSuccess(), "Potions are not gear");
     }
 
     @Test
-    void youCannotEquipSomethingYouDoNotEvenHave() {
-        InteractionResult result = game.equipItem("Excalibur");
-        assertFalse(result.isSuccess(), "Excalibur is not in this dungeon");
+    void equipItemNotInInventory() {
+        assertFalse(game.equipItem("Excalibur").isSuccess());
     }
-
-    //using items
 
     @Test
     void drinkingTheCoffeePotionActuallyHealsYou() {
         game.pickUpItem("Coffee Potion");
-        game.getPlayer().takeDamage(20); // get roughed up first
-        int healthAfterHit = game.getPlayer().getHealth();
+        game.getPlayer().takeDamage(20); //get roughed up first
+        int hp = game.getPlayer().getHealth();
 
-        InteractionResult result = game.useItem("Coffee Potion");
-        assertTrue(result.isSuccess());
-        assertTrue(game.getPlayer().getHealth() > healthAfterHit,
-                "Coffee Potion should restore some HP");
+        InteractionResult res = game.useItem("Coffee Potion");
+        assertTrue(res.isSuccess());
+        assertTrue(game.getPlayer().getHealth() > hp);
     }
 
     @Test
     void youCannotDrinkAKey() {
-        game.move(Direction.EAST);        //labStorage has the Archive Key
+        game.move(Direction.EAST); //labStorage has the Archive Key
         game.pickUpItem("Archive Key");
-        InteractionResult result = game.useItem("Archive Key");
-        assertFalse(result.isSuccess(), "Keys are not beverages");
+        assertFalse(game.useItem("Archive Key").isSuccess(), "Keys are not beverages");
     }
 
     @Test
-    void tryingToUseAnItemYouDoNotHaveFails() {
-        InteractionResult result = game.useItem("Mystery Smoothie");
-        assertFalse(result.isSuccess(), "Can't use what you don't have");
+    void useItemNotInInventory() {
+        assertFalse(game.useItem("Mystery Smoothie").isSuccess());
     }
-
-    //unlocking rooms
 
     @Test
     void havingTheRightKeyUnlocksTheExamArchive() {
-        game.move(Direction.EAST);        //lectureHall -> labStorage
+        game.move(Direction.EAST);
         game.pickUpItem("Archive Key");
-        game.move(Direction.WEST);        //back to lectureHall
+        game.move(Direction.WEST);
 
-        InteractionResult result = game.unlockRoom(Direction.NORTH);
-        assertTrue(result.isSuccess());
-        assertFalse(game.getCurrentRoom().getExit(Direction.NORTH).isLocked(),
-                "Exam archive should now be open");
+        InteractionResult res = game.unlockRoom(Direction.NORTH);
+        assertTrue(res.isSuccess());
+        assertFalse(game.getCurrentRoom().getExit(Direction.NORTH).isLocked());
     }
 
     @Test
     void tryingToUnlockADoorWithNoKeyOnYouFails() {
-        //standing in lectureHall, archive is north, but we never grabbed the key
-        InteractionResult result = game.unlockRoom(Direction.NORTH);
-        assertFalse(result.isSuccess(), "No key, no entry");
-        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked(),
-                "Door should still be locked");
+        //standing in lectureHall, archive is north, never grabbed the key
+        InteractionResult res = game.unlockRoom(Direction.NORTH);
+        assertFalse(res.isSuccess(), "No key, no entry");
+        assertTrue(game.getCurrentRoom().getExit(Direction.NORTH).isLocked());
     }
 
     @Test
-    void tryingToUnlockADirectionWithNoRoomAtAllFails() {
-        game.move(Direction.WEST); //back to stairwell, which has no north exit
-        InteractionResult result = game.unlockRoom(Direction.NORTH);
-        assertFalse(result.isSuccess(), "There is no door there to unlock");
+    void unlockNoRoomFails() {
+        game.move(Direction.WEST); //back to stairwell, no north exit
+        assertFalse(game.unlockRoom(Direction.NORTH).isSuccess());
     }
 
     @Test
     void unlockingAnAlreadyOpenDoorJustSucceedsQuietly() {
-        //brokenElevator is south of lectureHall and has no lock
-        InteractionResult result = game.unlockRoom(Direction.SOUTH);
-        assertTrue(result.isSuccess(), "Already-open room should not cause an error");
+        //brokenElevator south of lectureHall has no lock
+        assertTrue(game.unlockRoom(Direction.SOUTH).isSuccess());
     }
 
-    //inventory boundary checks
-
+    //prof said to use parameterized tests, using them for inventory boundary values
     @ParameterizedTest(name = "bag with {0} out of 8 slots filled")
     @ValueSource(ints = {0, 1, 7, 8})
-    void inventoryKnowsWhenItIsFull(int itemsToAdd) {
+    void inventoryFullTest(int itemsToAdd) {
         Inventory bag = new Inventory(8);
         for (int i = 0; i < itemsToAdd; i++) {
             bag.addItem(new Potion("Potion " + i, "Filler.", 1));

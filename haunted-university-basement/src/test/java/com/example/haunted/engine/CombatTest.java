@@ -1,12 +1,12 @@
 //Brady
 //Prompt:
-//Write humanized JUnit 5 tests for CombatEngine via GameEngine covering: attacking TA deals damage,
-//TA counterattacks when not killed in one hit, killing TA drops loot, defeated monster stays dead,
-//attacking a nonexistent monster fails, attacking an already-dead monster fails, dead player cannot attack.
-//Also test BossMonster directly for enrage at half HP. Test a weak player getting counterattacked by the
-//boss using a custom arena setup. Test full quest completion by building a custom arena where hero kills
-//the Final Exam Phantom after picking up the Lost Gradebook. Parameterized test for DamageCalculator
-//never going below 1 with boundary values. Use "Chad" for the underpowered student.
+//tests for combat. check that attacking the TA deals damage and that the TA hits back
+//when it survives. test killing the TA drops loot and that a dead monster stays dead.
+//edge cases: attacking something that isn't there, attacking a dead monster, attacking
+//while player is already dead. test the boss enrage mechanic directly. also test that a
+//weak player gets counterattacked by the boss. build a small custom arena to test that
+//picking up the lost grade book and killing the phantom wins the game. parameterized test
+//for damage floor. use Chad for the weak student
 
 package com.example.haunted.engine;
 
@@ -44,29 +44,24 @@ public class CombatTest {
         game.move(Direction.EAST); //stairwell -> lectureHall, where the TA is waiting
     }
 
-    //basic combat
-
     @Test
-    void hittingTheTAActuallyDoesHurtIt() {
-        int taHealthBefore = game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().getHealth();
-        CombatResult result = game.attack("Sleep-Deprived TA");
-        assertTrue(result.isSuccess());
-        assertTrue(result.getDamageToMonster() > 0, "Attack should deal some damage");
-        assertTrue(game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().getHealth() < taHealthBefore);
+    void attackDamagesMonster() {
+        int hpBefore = game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().getHealth();
+        CombatResult res = game.attack("Sleep-Deprived TA");
+        assertTrue(res.isSuccess());
+        assertTrue(res.getDamageToMonster() > 0);
+        assertTrue(game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().getHealth() < hpBefore);
     }
 
     @Test
     void theTADoesNotJustStandThereAndTakeIt() {
-        //TA has 18 HP — one hit does 6 damage, so it survives and swings back
-        CombatResult result = game.attack("Sleep-Deprived TA");
-        assertTrue(result.isSuccess());
-        assertFalse(result.isMonsterDefeated(), "TA should still be standing after one hit");
-        assertTrue(result.getDamageToPlayer() > 0, "TA should hit back");
-        assertTrue(game.getPlayer().getHealth() < game.getPlayer().getMaxHealth(),
-                "Player should have some bruises");
+        //TA has 18 HP, one hit does 6 damage so it survives and swings back
+        CombatResult res = game.attack("Sleep-Deprived TA");
+        assertTrue(res.isSuccess());
+        assertFalse(res.isMonsterDefeated(), "TA should still be standing after one hit");
+        assertTrue(res.getDamageToPlayer() > 0);
+        assertTrue(game.getPlayer().getHealth() < game.getPlayer().getMaxHealth());
     }
-
-    //defeat and loot
 
     @Test
     void whenYouFinallyKillTheTAItDropsItsCoffee() {
@@ -75,23 +70,21 @@ public class CombatTest {
             game.attack("Sleep-Deprived TA");
         }
         assertTrue(game.getCurrentRoom().findItem("Coffee Potion").isPresent(),
-                "TA drops a Coffee Potion as loot — small consolation");
+                "TA drops a Coffee Potion as loot, small consolation");
     }
 
     @Test
-    void aDefeatedMonsterIsActuallyDead() {
+    void killedMonsterIsDead() {
         while (game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().isAlive()) {
             game.attack("Sleep-Deprived TA");
         }
         assertFalse(game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().isAlive());
     }
 
-    //edge cases
-
     @Test
-    void attackingAMonsterThatIsNotInTheRoomJustFails() {
-        CombatResult result = game.attack("The Easter Bunny");
-        assertFalse(result.isSuccess(), "Can't fight something that isn't there");
+    void attackMissingMonster() {
+        CombatResult res = game.attack("The Easter Bunny");
+        assertFalse(res.isSuccess());
     }
 
     @Test
@@ -99,19 +92,17 @@ public class CombatTest {
         while (game.getCurrentRoom().findMonster("Sleep-Deprived TA").get().isAlive()) {
             game.attack("Sleep-Deprived TA");
         }
-        CombatResult result = game.attack("Sleep-Deprived TA");
-        assertFalse(result.isSuccess(), "Beating a dead TA is not allowed");
+        CombatResult res = game.attack("Sleep-Deprived TA");
+        assertFalse(res.isSuccess(), "Beating a dead TA is not allowed");
     }
 
     @Test
-    void aDeadPlayerCannotAttackAnything() {
+    void deadPlayerCantAttack() {
         game.getPlayer().takeDamage(9999); //instant death
-        CombatResult result = game.attack("Sleep-Deprived TA");
-        assertFalse(result.isSuccess(), "Dead students do not fight back");
+        CombatResult res = game.attack("Sleep-Deprived TA");
+        assertFalse(res.isSuccess());
         assertTrue(game.isGameOver());
     }
-
-    //boss monster
 
     @Test
     void theBossIsChillUntilYouGetItBelowHalfHealthThenItLosesIt() {
@@ -123,7 +114,7 @@ public class CombatTest {
 
     @Test
     void anUnderpoweredStudentGetsCounterattackedByTheBoss() {
-        //using a weak student so the boss survives long enough to hit back
+        //using Chad so the boss survives long enough to hit back
         Player underpoweredStudent = new Player("Chad", 100, 5, 0, new Inventory(10));
         Room finalRoom = new Room("final", "Final Chamber", "You probably should have studied.");
         BossMonster phantom = new BossMonster("Final Exam Phantom", 40, 10, 4, List.of(), 3);
@@ -133,28 +124,25 @@ public class CombatTest {
         Quest quest = new Quest("Escape the Basement", "Good luck.");
         CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), new QuestTracker());
 
-        int healthBefore = underpoweredStudent.getHealth();
-        CombatResult result = combatEngine.attack(underpoweredStudent, quest, phantom);
+        int hp = underpoweredStudent.getHealth();
+        CombatResult res = combatEngine.attack(underpoweredStudent, quest, phantom);
 
-        assertTrue(result.isSuccess());
-        assertFalse(result.isMonsterDefeated(), "Boss survives Chad's weak hit");
-        assertTrue(underpoweredStudent.getHealth() < healthBefore, "Boss absolutely hits back");
+        assertTrue(res.isSuccess());
+        assertFalse(res.isMonsterDefeated(), "Boss survives Chad's weak hit");
+        assertTrue(underpoweredStudent.getHealth() < hp, "Boss absolutely hits back");
     }
-
-    //quest completion
 
     @Test
     void retrievingTheGradebookAndSlayingThePhantomActuallyWinsTheGame() {
-        //skip the dungeon crawl — build a direct boss arena for this test
+        //skip the dungeon crawl, build a direct boss arena for this test
         Player hero = new Player("Hero", 999, 999, 10, new Inventory(10));
         Room finalRoom = new Room("final", "Final Chamber", "The last stand.");
         BossMonster phantom = new BossMonster("Final Exam Phantom", 40, 10, 4, List.of(), 3);
         finalRoom.addMonster(phantom);
-        finalRoom.addItem(new QuestItem("Lost Gradebook", "The legendary missing gradebook."));
+        finalRoom.addItem(new QuestItem("Lost Gradebook", "The legendary missing grade book."));
         hero.setCurrentRoom(finalRoom);
 
-        Quest quest = new Quest("Escape the Basement",
-                "Recover the gradebook and defeat the Phantom.");
+        Quest quest = new Quest("Escape the Basement", "Recover the grade book and defeat the Phantom.");
         QuestTracker tracker = new QuestTracker();
         CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), tracker);
         InteractionEngine interactionEngine = new InteractionEngine(tracker);
@@ -168,21 +156,20 @@ public class CombatTest {
             bossArena.attack("Final Exam Phantom");
         }
 
-        assertTrue(quest.isGradebookRecovered(), "Gradebook should be marked recovered");
-        assertTrue(quest.isPhantomDefeated(), "Phantom should be marked defeated");
-        assertTrue(bossArena.isGameWon(), "Both objectives done — game should be won");
+        assertTrue(quest.isGradebookRecovered());
+        assertTrue(quest.isPhantomDefeated());
+        assertTrue(bossArena.isGameWon(), "Both objectives done, game should be won");
     }
 
-    //damage floor
-
+    //assignment says to use parameterized tests so using them for damage boundary values
     @ParameterizedTest(name = "attack {0} vs defense {1} should deal {2} damage (floor is always 1)")
     @CsvSource({
         "10, 5, 5",  //normal hit
-        "5,  5, 1",  //attack ties defense — still does 1
-        "1, 10, 1",  //hopelessly outclassed — still does 1
+        "5,  5, 1",  //attack ties defense, still does 1
+        "1, 10, 1",  //hopelessly outclassed, still does 1
         "7,  1, 6"   //actual player vs TA numbers from the game
     })
-    void damageNeverDropsBelowOneNoMatterHowToughTheMonsterIs(int atk, int def, int expected) {
+    void damageFloorIsOne(int atk, int def, int expected) {
         DamageCalculator calc = new DamageCalculator();
         Player attacker = new Player("Attacker", 100, atk, 0, new Inventory(5));
         Monster defender = new Monster("Tank", 100, 5, def, List.of());
