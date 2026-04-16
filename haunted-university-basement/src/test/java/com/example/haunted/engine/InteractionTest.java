@@ -13,12 +13,10 @@ package com.example.haunted.engine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.example.haunted.config.DungeonFactory;
 import com.example.haunted.events.InteractionResult;
 import com.example.haunted.model.Direction;
 import com.example.haunted.model.Inventory;
@@ -29,12 +27,6 @@ import com.example.haunted.model.Weapon;
 public class InteractionTest {
 
     private GameEngine game;
-
-    @BeforeEach
-    void startInLectureHall() {
-        game = DungeonFactory.createGame();
-        game.move(Direction.EAST); //stairwell -> lectureHall, which has the Coffee Potion
-    }
 
     @Test
     void pickupAddsToInventory() {

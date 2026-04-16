@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.example.haunted.engine.GameEngine;
@@ -23,11 +22,6 @@ import com.example.haunted.model.QuestStatus;
 public class GameSetupTest {
 
     private GameEngine game;
-
-    @BeforeEach
-    void buildTheDungeon() {
-        game = DungeonFactory.createGame();
-    }
 
     @Test
     void dungeonLoads() {
