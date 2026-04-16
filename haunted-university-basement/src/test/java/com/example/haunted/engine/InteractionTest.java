@@ -1,3 +1,13 @@
+//Brady
+//Prompt:
+//Write humanized JUnit 5 tests for InteractionEngine via GameEngine covering: pickup success adds to
+//inventory, pickup nonexistent item fails, full inventory blocks pickup and item stays in room, picking
+//up Lost Gradebook marks quest gradebookRecovered. Equip weapon boosts attack, equip armor boosts defense,
+//equipping a potion fails, equipping something not in inventory fails. Using a potion heals a wounded
+//player, using a key fails, using item not in inventory fails. Unlocking exam archive with correct key
+//succeeds, unlocking without key fails, unlocking a direction with no room fails, unlocking already-open
+//room succeeds quietly. Parameterized inventory boundary test at 0, 1, 7, and 8 items out of 8 capacity.
+
 package com.example.haunted.engine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

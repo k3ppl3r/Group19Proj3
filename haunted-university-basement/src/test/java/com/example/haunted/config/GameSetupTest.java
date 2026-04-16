@@ -1,3 +1,11 @@
+//Brady
+//Prompt:
+//Write humanized JUnit 5 tests that call DungeonFactory.createGame() and verify the entire game world is
+//wired up correctly: player starts in stairwell, stairwell has only one exit going east, lecture hall has
+//a Coffee Potion and the Sleep-Deprived TA, exam archive and final chamber are locked, broken elevator has
+//an armed trap, lab storage has the Archive Key, dean vault has the Vault Key, quest starts as NOT_STARTED,
+//player is alive, game is not over, game is not won. Use a @BeforeEach to build the dungeon fresh each test.
+
 package com.example.haunted.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

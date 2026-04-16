@@ -1,3 +1,13 @@
+//Brady
+//Prompt:
+//Write humanized JUnit 5 tests for CombatEngine via GameEngine covering: attacking TA deals damage,
+//TA counterattacks when not killed in one hit, killing TA drops loot, defeated monster stays dead,
+//attacking a nonexistent monster fails, attacking an already-dead monster fails, dead player cannot attack.
+//Also test BossMonster directly for enrage at half HP. Test a weak player getting counterattacked by the
+//boss using a custom arena setup. Test full quest completion by building a custom arena where hero kills
+//the Final Exam Phantom after picking up the Lost Gradebook. Parameterized test for DamageCalculator
+//never going below 1 with boundary values. Use "Chad" for the underpowered student.
+
 package com.example.haunted.engine;
 
 import java.util.List;

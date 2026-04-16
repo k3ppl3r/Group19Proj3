@@ -1,3 +1,11 @@
+//Brady
+//Prompt:
+//Write humanized JUnit 5 tests for the Player model class covering: takeDamage reduces health correctly,
+//health never drops below zero (parameterized with boundary values including overkill), heal restores health
+//but cannot exceed max, player dies at zero HP, isAlive returns correct state, equipWeapon increases
+//getAttackPower, equipArmor increases getDefensePower, and base attack/defense are used when nothing is equipped.
+//Use "Alex" as the player name and keep test names conversational.
+
 package com.example.haunted.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

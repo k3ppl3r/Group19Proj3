@@ -1,3 +1,11 @@
+//Brady
+//Prompt:
+//Write humanized JUnit 5 tests for MovementEngine via GameEngine covering: successful east move updates
+//current room, parameterized test for all blocked directions from stairwell, locked door blocks movement,
+//trap triggers and deals damage when entering broken elevator, trap disarms after one trigger so second
+//entry is safe. Also test TrapResolver directly for: null trap does nothing, disarmed trap does nothing,
+//and a non-one-time trap stays armed after firing. Use "Alex" as the player name and keep test names casual.
+
 package com.example.haunted.engine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
