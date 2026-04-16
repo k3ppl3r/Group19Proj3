@@ -90,7 +90,7 @@ public class Room {
         return locked;
     }
 
-    public void setLocked(boolean locked, String requiredKeyName) {
+    public void setLocked(boolean locked) {
         this.locked = locked;
         this.requiredKeyName = requiredKeyName;
     }
@@ -116,5 +116,9 @@ public class Room {
 
     public void setTrap(Trap trap) {
         this.trap = trap;
+    }
+
+    public void setExit(Direction direction, Room northRoom) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

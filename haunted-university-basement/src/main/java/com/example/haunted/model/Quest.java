@@ -56,4 +56,8 @@ public class Quest {
     public boolean isComplete() {
         return status == QuestStatus.COMPLETED;
     }
+
+    public void setComplete(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

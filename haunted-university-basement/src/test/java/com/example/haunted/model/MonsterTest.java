@@ -6,28 +6,20 @@
 
 package com.example.haunted.model;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class MonsterTest {
     private List<Item> testLoot;
     private Monster monster;
     private final int MAX_HP = 100;
-
-    @BeforeEach
-    void setUp() {
-        testLoot = new ArrayList<>();
-        testLoot.add(new Key("Rusty Key", "Opens a chest"));
-        monster = new Monster("Ghoul", MAX_HP, 15, 5, testLoot);
-    }
 
     @Test
     @DisplayName("Mutation Killing: Verify defensive copy of loot in constructor")

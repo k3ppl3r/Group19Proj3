@@ -60,8 +60,8 @@ public final class DungeonFactory {
 
         finalChamber.connect(Direction.SOUTH, deanVault);
 
-        examArchive.setLocked(true, "Archive Key");
-        finalChamber.setLocked(true, "Vault Key");
+        examArchive.setLocked(true);
+        finalChamber.setLocked(true);
 
         brokenElevator.setTrap(new Trap("Loose Wires Trap", TrapType.ELECTRIC, 8, true, true));
 

@@ -14,10 +14,15 @@
 
 package com.example.haunted.engine;
 
-import com.example.haunted.events.CombatResult;
-import com.example.haunted.events.InteractionResult;
-import com.example.haunted.events.MoveResult;
-import com.example.haunted.model.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,10 +30,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.example.haunted.events.CombatResult;
+import com.example.haunted.events.InteractionResult;
+import com.example.haunted.events.MoveResult;
+import com.example.haunted.model.Armor;
+import com.example.haunted.model.Direction;
+import com.example.haunted.model.Inventory;
+import com.example.haunted.model.Item;
+import com.example.haunted.model.Key;
+import com.example.haunted.model.Monster;
+import com.example.haunted.model.Player;
+import com.example.haunted.model.Quest;
+import com.example.haunted.model.Room;
 
 class GameEngineTest {
     private GameEngine gameEngine;
@@ -136,8 +149,8 @@ class GameEngineTest {
     @Test
     @DisplayName("Null Testing: Misspelled monster name")
     void testAttackWithMisspelledName() {
-        // Should handle "Plagiaris Ghost" (missing 'm') gracefully
-        CombatResult result = gameEngine.attack("Plagiaris Ghost");
+        // Should handle "Plagiarism Ghost" (missing 'm') gracefully
+        CombatResult result = gameEngine.attack("Plagiarism Ghost");
         
         assertNotNull(result, "Engine should return a failure result instead of throwing NPE");
         assertFalse(result.isSuccess(), "Attack should fail for misspelled monster name");
