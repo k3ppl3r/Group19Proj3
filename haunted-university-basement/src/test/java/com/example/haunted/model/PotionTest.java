@@ -3,6 +3,7 @@
 //tests for the Potion class. check for proper naming, descriptions, and valid healingAmount for potion.java
 //make sure getHealingAmount returns the correct and valid data
 //search for possible mutation bugs that could be discovered by tests
+//based largely on the ArmorTest code
 
 package com.example.haunted.model;
 
