@@ -30,7 +30,7 @@ public class MovementEngine {
         player.setCurrentRoom(targetRoom);
         Trap trap = targetRoom.getTrap();
         if (trap != null && trap.isArmed()) {
-            InteractionResult trapResult = trapResolver.resolveTrap(player, trap);
+            InteractionResult trapResult = extracted(player, trap);
             return new MoveResult(true,
                     "Moved to " + targetRoom.getName() + ". " + trapResult.getMessage(),
                     true,
@@ -39,4 +39,9 @@ public class MovementEngine {
 
         return new MoveResult(true, "Moved to " + targetRoom.getName() + ".", false, 0);
     }
+
+	private InteractionResult extracted(Player player, Trap trap) {
+		InteractionResult trapResult = trapResolver.resolveTrap(player, trap);
+		return trapResult;
+	}
 }
