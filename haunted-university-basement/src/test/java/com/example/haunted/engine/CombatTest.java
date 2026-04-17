@@ -31,6 +31,8 @@ import com.example.haunted.model.Quest;
 import com.example.haunted.model.QuestItem;
 import com.example.haunted.model.Room;
 import com.example.haunted.rules.DamageCalculator;
+import com.example.haunted.rules.QuestTracker;
+import com.example.haunted.rules.TrapResolver;
 
 public class CombatTest {
 
@@ -120,7 +122,7 @@ public class CombatTest {
         underpoweredStudent.setCurrentRoom(finalRoom);
 
         Quest quest = new Quest("Escape the Basement", "Good luck.");
-        CombatEngine combatEngine = new CombatEngine(null, null);
+        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), new QuestTracker());
 
         int hp = underpoweredStudent.getHealth();
         CombatResult res = combatEngine.attack(underpoweredStudent, quest, phantom);
@@ -141,11 +143,12 @@ public class CombatTest {
         hero.setCurrentRoom(finalRoom);
 
         Quest quest = new Quest("Escape the Basement", "Recover the grade book and defeat the Phantom.");
-        CombatEngine combatEngine = new CombatEngine(null, null);
-        InteractionEngine interactionEngine = new InteractionEngine(null);
+        QuestTracker tracker = new QuestTracker();
+        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), tracker);
+        InteractionEngine interactionEngine = new InteractionEngine(tracker);
         GameEngine bossArena = new GameEngine(
                 hero, quest,
-                new MovementEngine(null),
+                new MovementEngine(new TrapResolver()),
                 combatEngine, interactionEngine);
 
         bossArena.pickUpItem("Lost Gradebook");

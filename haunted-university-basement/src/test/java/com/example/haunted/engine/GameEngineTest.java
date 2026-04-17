@@ -1,13 +1,13 @@
 // Francis
 // Prompt:
-// generate tests that search for movement and room navigation validation making search that the player actually 
-// changes directions and returns a successful move result. Tests searching for boundaries as well as locked entrances. 
-// Check for correct attacking methods be ensuring that the target identification works successfully and checking 
-// that defeating a monster would actually update the quest. test the engine behavior for a player trying to attack while at 
-// 0 health. Generate test for pickup mechanics of the game, test equiptItem through the GameEngine making sure it updates players 
-// stats. To check unlock progression, test a sequence of picking up a key and attempting to unlock a door. Test the players win/loss 
-// conditions making sure what is false is actually going to be false. Also testing for what occurs if the quest is 
-// completed but the player is dead. Finally, conduct some Null testing on attack for when the monster's name is 
+// generate tests that search for movement and room navigation validation making search that the player actually
+// changes directions and returns a successful move result. Tests searching for boundaries as well as locked entrances.
+// Check for correct attacking methods be ensuring that the target identification works successfully and checking
+// that defeating a monster would actually update the quest. test the engine behavior for a player trying to attack while at
+// 0 health. Generate test for pickup mechanics of the game, test equiptItem through the GameEngine making sure it updates players
+// stats. To check unlock progression, test a sequence of picking up a key and attempting to unlock a door. Test the players win/loss
+// conditions making sure what is false is actually going to be false. Also testing for what occurs if the quest is
+// completed but the player is dead. Finally, conduct some Null testing on attack for when the monster's name is
 // misspelled. Along with a test of boolean logic in isgamewon.
 
 // Reimported the code and generated comments explaining the each test.
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,12 +32,16 @@ import com.example.haunted.events.InteractionResult;
 import com.example.haunted.events.MoveResult;
 import com.example.haunted.model.Armor;
 import com.example.haunted.model.Direction;
+import com.example.haunted.model.Inventory;
 import com.example.haunted.model.Item;
 import com.example.haunted.model.Key;
 import com.example.haunted.model.Monster;
 import com.example.haunted.model.Player;
 import com.example.haunted.model.Quest;
 import com.example.haunted.model.Room;
+import com.example.haunted.rules.DamageCalculator;
+import com.example.haunted.rules.QuestTracker;
+import com.example.haunted.rules.TrapResolver;
 
 class GameEngineTest {
     private GameEngine gameEngine;
@@ -46,6 +51,29 @@ class GameEngineTest {
     private Quest quest;
     private Monster ghost;
 
+    @BeforeEach
+    void setup() {
+        startRoom = new Room("start", "Starting Room");
+        northRoom = new Room("north", "North Room");
+        startRoom.connect(Direction.NORTH, northRoom);
+        northRoom.connect(Direction.SOUTH, startRoom);
+
+        ghost = new Monster("Plagiarism Ghost", 22, 8, 2, java.util.List.of());
+        startRoom.addMonster(ghost);
+
+        player = new Player("Test Player", 100, 10, 5, new Inventory(8));
+        player.setCurrentRoom(startRoom);
+
+        quest = new Quest("Test Quest", "Defeat everything.");
+
+        QuestTracker tracker = new QuestTracker();
+        gameEngine = new GameEngine(
+                player, quest,
+                new MovementEngine(new TrapResolver()),
+                new CombatEngine(new DamageCalculator(), tracker),
+                new InteractionEngine(tracker));
+    }
+
     // --- MOVEMENT & NAVIGATION ---
 
     @ParameterizedTest
@@ -53,7 +81,7 @@ class GameEngineTest {
     @DisplayName("Movement: Successful room transition and results")
     void testSuccessfulMovement(Direction dir) {
         MoveResult result = gameEngine.move(dir);
-        
+
         assertAll(
             () -> assertTrue(result.isSuccess(), "Move should be successful"),
             () -> assertEquals(northRoom, player.getCurrentRoom(), "Player location must change to the new room"),
@@ -64,9 +92,8 @@ class GameEngineTest {
     @Test
     @DisplayName("Boundaries: Moving into a non-existent exit")
     void testInvalidMovement() {
-        // There is no exit to the EAST in the startRoom
-        MoveResult result = gameEngine.move(Direction.EAST); 
-        
+        MoveResult result = gameEngine.move(Direction.EAST);
+
         assertAll(
             () -> assertFalse(result.isSuccess(), "Should fail when moving into a wall"),
             () -> assertEquals(startRoom, player.getCurrentRoom(), "Player should not change rooms")
@@ -78,7 +105,7 @@ class GameEngineTest {
     void testLockedRoomMovement() {
         northRoom.setLocked(true);
         MoveResult result = gameEngine.move(Direction.NORTH);
-        
+
         assertFalse(result.isSuccess(), "Movement should fail if the destination is locked");
         assertEquals(startRoom, player.getCurrentRoom(), "Player should remain in start room if locked");
     }
@@ -88,22 +115,20 @@ class GameEngineTest {
     @Test
     @DisplayName("Combat: Target identification and quest updates")
     void testAttackAndDefeatMonster() {
-        // Verify target identification works
         CombatResult result = gameEngine.attack("Plagiarism Ghost");
         assertNotNull(result, "CombatResult should not be null for existing monster");
 
-        // Reduce health to simulate defeat
-        ghost.takeDamage(100); 
-        gameEngine.attack("Plagiarism Ghost"); // Trigger the defeat check in engine/quest
-        
+        ghost.takeDamage(100);
+        gameEngine.attack("Plagiarism Ghost");
+
         assertTrue(quest.isComplete() || ghost.getHealth() == 0, "Defeating the monster should update game state");
     }
 
     @Test
     @DisplayName("Edge Case: Attacking while at 0 health")
     void testAttackWhileDead() {
-        player.takeDamage(1000); // Reduce player to 0 HP
-        
+        player.takeDamage(1000);
+
         CombatResult result = gameEngine.attack("Plagiarism Ghost");
         assertAll(
             () -> assertFalse(player.isAlive(), "Player should be dead"),
@@ -114,9 +139,8 @@ class GameEngineTest {
     @Test
     @DisplayName("Null Testing: Misspelled monster name")
     void testAttackWithMisspelledName() {
-        // Should handle "Plagiarism Ghost" (missing 'm') gracefully
-        CombatResult result = gameEngine.attack("Plagiarism Ghost");
-        
+        CombatResult result = gameEngine.attack("Plagiarism Ghst"); //intentional typo
+
         assertNotNull(result, "Engine should return a failure result instead of throwing NPE");
         assertFalse(result.isSuccess(), "Attack should fail for misspelled monster name");
     }
@@ -140,10 +164,10 @@ class GameEngineTest {
     void testEquipItemUpdatesStats() {
         Armor vest = new Armor("Protective Vest", "Sturdy", 10);
         player.getInventory().addItem(vest);
-        
+
         int initialDefense = player.getDefensePower();
         gameEngine.equipItem("Protective Vest");
-        
+
         assertEquals(initialDefense + 10, player.getDefensePower(), "Defense power should increase after equipping");
     }
 
@@ -153,10 +177,11 @@ class GameEngineTest {
         Key key = new Key("Golden Key", "Shiny");
         startRoom.addItem(key);
         northRoom.setLocked(true);
+        northRoom.setRequiredKeyName("Golden Key");
 
         gameEngine.pickUpItem("Golden Key");
         InteractionResult result = gameEngine.unlockRoom(Direction.NORTH);
-        
+
         assertTrue(result.isSuccess(), "Should unlock the room if the player has the key");
     }
 
@@ -165,18 +190,14 @@ class GameEngineTest {
     @Test
     @DisplayName("Game State: Win/Loss and Boolean logic validation")
     void testGameStatusConditions() {
-        // Case 1: Player dead (Loss)
         player.takeDamage(player.getMaxHealth());
         assertTrue(gameEngine.isGameOver(), "Should be Game Over if player health is 0");
         assertFalse(gameEngine.isGameWon(), "Cannot win if player is dead");
 
-        // Case 2: Alive but Quest not done
         player.heal(100);
         assertFalse(gameEngine.isGameWon(), "Should be false if quest is incomplete");
 
-        // Case 3: Alive and Quest done (Win)
-        // Manually complete quest for testing purposes
-        quest.setComplete(true); 
+        quest.setComplete(true);
         assertTrue(gameEngine.isGameWon(), "Should win if alive and quest is complete");
     }
 
@@ -184,9 +205,8 @@ class GameEngineTest {
     @DisplayName("Boolean Logic: Quest complete but player is dead")
     void testQuestCompleteButDead() {
         quest.setComplete(true);
-        player.takeDamage(1000); // Kill player
-        
-        // This kills mutations that change '&&' to '||' in isGameWon()
+        player.takeDamage(1000);
+
         assertAll(
             () -> assertFalse(gameEngine.isGameWon(), "Game is NOT won if player is dead, even if quest is complete"),
             () -> assertTrue(gameEngine.isGameOver(), "GameOver should be true")

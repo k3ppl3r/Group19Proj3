@@ -58,6 +58,10 @@ public class Quest {
     }
 
     public void setComplete(boolean b) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (b) {
+            this.gradebookRecovered = true;
+            this.phantomDefeated = true;
+            this.status = QuestStatus.COMPLETED;
+        }
     }
 }

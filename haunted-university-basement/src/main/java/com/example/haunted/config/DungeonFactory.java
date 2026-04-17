@@ -20,7 +20,9 @@ import com.example.haunted.model.Room;
 import com.example.haunted.model.Trap;
 import com.example.haunted.model.TrapType;
 import com.example.haunted.model.Weapon;
+import com.example.haunted.rules.DamageCalculator;
 import com.example.haunted.rules.QuestTracker;
+import com.example.haunted.rules.TrapResolver;
 
 public final class DungeonFactory {
     private DungeonFactory() {
@@ -61,7 +63,9 @@ public final class DungeonFactory {
         finalChamber.connect(Direction.SOUTH, deanVault);
 
         examArchive.setLocked(true);
+        examArchive.setRequiredKeyName("Archive Key");
         finalChamber.setLocked(true);
+        finalChamber.setRequiredKeyName("Vault Key");
 
         brokenElevator.setTrap(new Trap("Loose Wires Trap", TrapType.ELECTRIC, 8, true, true));
 
@@ -90,8 +94,8 @@ public final class DungeonFactory {
         );
 
         QuestTracker questTracker = new QuestTracker();
-        MovementEngine movementEngine = new MovementEngine(null);
-        CombatEngine combatEngine = new CombatEngine(null, questTracker);
+        MovementEngine movementEngine = new MovementEngine(new TrapResolver());
+        CombatEngine combatEngine = new CombatEngine(new DamageCalculator(), questTracker);
         InteractionEngine interactionEngine = new InteractionEngine(questTracker);
 
         return new GameEngine(player, quest, movementEngine, combatEngine, interactionEngine);
