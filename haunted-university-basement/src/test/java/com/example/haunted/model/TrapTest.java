@@ -4,6 +4,8 @@ package com.example.haunted.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -38,16 +40,14 @@ class TrapTest {
 		assertEquals(amount, trap.getDamage(), "Damage should equal constructor input");
 	}
 	
-	@ParameterizedTest
-	@CsvSource({
-		"Electric, TrapType.ELECTRIC",
-		"Steam, TrapType.STEAM"
-	})
+	@Test
 	@DisplayName("Type: verify getType returns correct and valid information")
-	void testGetType(String name, TrapType expectedType) {
-		Trap trap = new Trap(name, type, 5, true, true);
-		
-		assertEquals(type, trap.getType(), "Type should match constructor input");
+	void testGetType() {
+		Trap electric = new Trap("Electric", TrapType.ELECTRIC, 5, true, true);
+		Trap steam = new Trap("Steam", TrapType.STEAM, 5, true, true);
+
+		assertEquals(TrapType.ELECTRIC, electric.getType(), "Type should match constructor input");
+		assertEquals(TrapType.STEAM, steam.getType(), "Type should match constructor input");
 	}
 	
 	@Test
