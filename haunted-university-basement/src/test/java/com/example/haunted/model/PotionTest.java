@@ -66,7 +66,7 @@ class PotionTest {
 		//test Potion inherits the null guards from the Item class
 		assertAll(
 			() -> assertThrows(NullPointerException.class, () -> new Potion(null, "desc", 10)),
-			() -> assertThrows(NullPointerException.class, () -> new Potion("name", null, 10)),
+			() -> assertThrows(NullPointerException.class, () -> new Potion("name", null, 10))
 		);
 	}
 	
