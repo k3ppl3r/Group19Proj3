@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 public class InventoryTest {
 
     @Test
-    void addingAnItemPutsItInTheBag() {
+    void addItem() {
         Inventory bag = new Inventory(5);
         bag.addItem(new Key("Dorm Key", "Opens your room."));
         assertTrue(bag.contains("Dorm Key"));
@@ -35,13 +35,13 @@ public class InventoryTest {
     }
 
     @Test
-    void containsReturnsFalseWhenItemNotThere() {
+    void containsMissing() {
         Inventory bag = new Inventory(5);
         assertFalse(bag.contains("Invisible Homework"));
     }
 
     @Test
-    void removingAnItemActuallyRemovesIt() {
+    void removeItem() {
         Inventory bag = new Inventory(5);
         bag.addItem(new Key("Archive Key", "Opens the archive."));
         Item removed = bag.removeItem("Archive Key");
@@ -50,13 +50,13 @@ public class InventoryTest {
     }
 
     @Test
-    void removingItemNotInInventoryReturnsNull() {
+    void removeMissingReturnsNull() {
         Inventory bag = new Inventory(5);
         assertNull(bag.removeItem("Excalibur"));
     }
 
     @Test
-    void fullInventoryRejectsNewItems() {
+    void fullBagRejectsNewItems() {
         Inventory bag = new Inventory(2);
         bag.addItem(new Key("Key 1", "First key."));
         bag.addItem(new Key("Key 2", "Second key."));
@@ -74,7 +74,7 @@ public class InventoryTest {
     }
 
     @Test
-    void capacityIsStoredCorrectly() {
+    void capacityStoredCorrectly() {
         Inventory bag = new Inventory(8);
         assertEquals(8, bag.getCapacity());
     }
