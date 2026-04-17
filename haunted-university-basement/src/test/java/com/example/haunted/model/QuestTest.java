@@ -1,15 +1,4 @@
 //Hannah Huang
-//prompt:
-//tests for Quest.java (things involving QuestStatus are lumped in here because it is just an enum)
-//check for proper naming and description assignment
-//check that markGradebookRecovered and markPhantomDefeated update those values accordingly
-//check that isGradebookRecovered and isPhantomDefeated return correct and valid data
-//check that a Quest cannot have a null name or description
-//search for possible mutation bugs that could be discovered by tests
-
-//check that Quest Status is updated correctly, and isComplete returns correct and valid data
-//search for possible mutation bugs that could be discovered by tests
-
 
 package com.example.haunted.model;
 

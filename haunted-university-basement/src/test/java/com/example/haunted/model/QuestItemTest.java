@@ -1,9 +1,5 @@
 //Hannah Huang
-//prompt:
-//tests for QuestItem.java
-//check for proper naming and description
-//make sure it's a subclass of Item
-//make sure null guards are in place
+//based largely on my PotionTest code
 
 package com.example.haunted.model;
 
