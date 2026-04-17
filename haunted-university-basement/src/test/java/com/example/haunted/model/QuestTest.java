@@ -13,12 +13,14 @@
 
 package com.example.haunted.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class QuestTest {
 	
@@ -111,7 +113,7 @@ class QuestTest {
 	void testNullChecks() {
 		assertAll(
 			() -> assertThrows(NullPointerException.class, () -> new Quest(null, "desc")),
-			() -> assertThrows(NullPointerExcpetion.class, () -> new Quest("name", null))
+			() -> assertThrows(NullPointerException.class, () -> new Quest("name", null))
 		);
 	}
 	
@@ -127,18 +129,14 @@ class QuestTest {
 		Quest testQuest = new Quest(name, "desc");
 		
 		switch(whatComplete) {
-			case 0:
-				break;
-			case 1:
-				testQuest.markPhantomDefeated();
-				break;
-			case 2:
-				testQuest.markGradebookRecovered();
-				break;
-			case 3:
-				testQuest.markPhantomDefeated();
-				testQuest.markGradebookRecovered();
-				break;
+			case 0 -> {
+                }
+			case 1 -> testQuest.markPhantomDefeated();
+			case 2 -> testQuest.markGradebookRecovered();
+			case 3 -> {
+                            testQuest.markPhantomDefeated();
+                            testQuest.markGradebookRecovered();
+                }
 		}
 		
 		assertEquals(expected, testQuest.isComplete(), "isComplete did not return the expected value");
