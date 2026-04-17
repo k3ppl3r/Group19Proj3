@@ -20,7 +20,7 @@ import com.example.haunted.engine.GameEngine;
 import com.example.haunted.model.Direction;
 import com.example.haunted.model.QuestStatus;
 
-public class GameSetupTest {
+public class DungeonFactoryTest {
 
     private GameEngine game;
 
