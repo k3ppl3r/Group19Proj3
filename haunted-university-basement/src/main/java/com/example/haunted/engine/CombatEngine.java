@@ -16,7 +16,7 @@ public class CombatEngine {
     private final DamageCalculator damageCalculator;
     private final QuestTracker questTracker;
 
-    public CombatEngine() {
+    public CombatEngine(DamageCalculator damageCalculator, QuestTracker questTracker) {
         this.damageCalculator = damageCalculator;
         this.questTracker = questTracker;
     }

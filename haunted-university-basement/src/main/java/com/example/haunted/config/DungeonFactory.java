@@ -90,9 +90,9 @@ public final class DungeonFactory {
         );
 
         QuestTracker questTracker = new QuestTracker();
-        MovementEngine movementEngine = new MovementEngine();
-        CombatEngine combatEngine = new CombatEngine();
-        InteractionEngine interactionEngine = new InteractionEngine();
+        MovementEngine movementEngine = new MovementEngine(null);
+        CombatEngine combatEngine = new CombatEngine(null, questTracker);
+        InteractionEngine interactionEngine = new InteractionEngine(questTracker);
 
         return new GameEngine(player, quest, movementEngine, combatEngine, interactionEngine);
     }
