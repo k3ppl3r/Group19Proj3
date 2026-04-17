@@ -22,7 +22,7 @@ public class Room {
     public Room(String id, String name) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
-        this.description = Objects.requireNonNull(description);
+        this.description = "";
         this.exits = new EnumMap<>(Direction.class);
         this.items = new ArrayList<>();
         this.monsters = new ArrayList<>();
@@ -92,6 +92,9 @@ public class Room {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public void setRequiredKeyName(String requiredKeyName) {
         this.requiredKeyName = requiredKeyName;
     }
 
