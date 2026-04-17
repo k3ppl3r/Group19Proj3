@@ -33,7 +33,7 @@ class QuestTest {
 		//testing
 		assertAll("Verify Quest properties are inherited and assigned correctly",
 			() -> assertEquals(name, quest.getName(), "Name should match the constructor input"),
-			() -> assertEquals(desc, quest.getDescription(), "Description should match the constructor input"),
+			() -> assertEquals(desc, quest.getDescription(), "Description should match the constructor input")
 		);
 	}
 	
